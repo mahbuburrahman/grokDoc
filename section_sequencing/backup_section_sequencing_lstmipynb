@@ -1,0 +1,265 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This is a section sequencing classifier. We used LSTM for section sequencing.\n",
+    "\n",
+    "https://stackoverflow.com/questions/38189070/how-do-i-create-a-variable-length-input-lstm-in-keras\n",
+    "\n",
+    "https://machinelearningmastery.com/sequence-prediction/\n",
+    "\n",
+    "https://stackoverflow.com/questions/43117654/many-to-many-sequence-prediction-with-different-sequence-length"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import sklearn.preprocessing as skprep\n",
+    "\n",
+    "import tensorflow as tf\n",
+    "from tensorflow.contrib import keras\n",
+    "from tensorflow.contrib.keras import models\n",
+    "from tensorflow.contrib.keras import datasets\n",
+    "from tensorflow.contrib.keras import layers\n",
+    "from tensorflow.contrib.keras import preprocessing\n",
+    "from tensorflow.contrib.keras import backend as K\n",
+    "from tensorflow.contrib.keras import callbacks\n",
+    "from tensorflow.contrib.keras import utils\n",
+    "\n",
+    "from sklearn import preprocessing\n",
+    "\n",
+    "from collections import defaultdict\n",
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import os\n",
+    "import json\n",
+    "import pickle\n",
+    "from datetime import datetime\n",
+    "import sys\n",
+    "from sklearn import metrics,cross_validation\n",
+    "from tensorflow.contrib.keras.python.keras.layers.wrappers import Bidirectional\n",
+    "\n",
+    "tf.logging.set_verbosity(tf.logging.WARN)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# encdoing labels into numbers\n",
+    "class_list={}\n",
+    "for x in open(\"data/class_list.txt\",\"r\").readlines():\n",
+    "    x=x.strip()\n",
+    "    class_list[x.split(\":\")[0]]=x.split(\":\")[1].lower()\n",
+    "\n",
+    "lencoder = preprocessing.LabelEncoder()\n",
+    "lencoder.fit_transform(class_list.values())\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Process training and test data\n",
+    "X_train={}\n",
+    "X_train[\"Sequence\"]=[]\n",
+    "train_f=open(\"data/train_section_sequencing_classifier\",\"r\")\n",
+    "\n",
+    "for line in train_f:\n",
+    "    line=list(lencoder.transform(line.strip().split(\",\")))\n",
+    "    if len(line)<1:\n",
+    "        continue\n",
+    "    X_train[\"Sequence\"].append(line)\n",
+    "\n",
+    "\n",
+    "\n",
+    "X_test={}\n",
+    "X_test[\"Sequence\"]=[]\n",
+    "test_f=open(\"data/test_section_sequencing_classifier\",\"r\")\n",
+    "\n",
+    "for line in test_f:\n",
+    "    line=list(lencoder.transform(line.strip().split(\",\")))\n",
+    "    if len(line)<1:\n",
+    "        continue\n",
+    "\n",
+    "    X_test[\"Sequence\"].append(line)\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print len(X_train[\"Sequence\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "max_features=16\n",
+    "num_mem_units = 64\n",
+    "size_batch = 1\n",
+    "num_timesteps = 1\n",
+    "num_features = 1\n",
+    "num_targets = 1\n",
+    "num_epochs = 100\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "model = models.Sequential()\n",
+    "model.add(layers.LSTM(num_mem_units, stateful=True,  batch_input_shape=(size_batch, num_timesteps, num_features),\n",
+    "  return_sequences=True))\n",
+    "model.add(layers.Dense(num_targets, activation='sigmoid'))\n",
+    "model.compile(loss='binary_crossentropy', optimizer='adam')\n",
+    "\n",
+    "print model.summary()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "range_act = (0, 1) # sigmoid\n",
+    "range_features = np.array([0, max_features]).reshape(-1, 1)\n",
+    "normalizer = skprep.MinMaxScaler(feature_range=range_act)\n",
+    "normalizer.fit(range_features)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "reset_state = callbacks.LambdaCallback(on_epoch_end=lambda *_ : model.reset_states())\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# training\n",
+    "for seq in X_train['Sequence']:\n",
+    "    X = seq[:-1]\n",
+    "    y = seq[1:] # predict next element\n",
+    "    X_norm = normalizer.transform(np.array(X).reshape(-1, 1)).reshape(-1, num_timesteps, num_features)\n",
+    "    y_norm = normalizer.transform(np.array(y).reshape(-1, 1)).reshape(-1, num_timesteps, num_targets)\n",
+    "    model.fit(X_norm, y_norm, epochs=num_epochs, batch_size=size_batch, shuffle=False,verbose=1,\n",
+    "      callbacks=[reset_state])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# prediction\n",
+    "index=0\n",
+    "for seq in X_test['Sequence']:\n",
+    "    model.reset_states() \n",
+    "    for istep in range(len(seq)-1): # input up to not incl last\n",
+    "        val = seq[istep]\n",
+    "        X = np.array([val]).reshape(-1, 1)\n",
+    "        X_norm = normalizer.transform(X).reshape(-1, num_timesteps, num_features)\n",
+    "        y_norm = model.predict(X_norm)\n",
+    "    yhat = int(normalizer.inverse_transform(y_norm[0])[0, 0])\n",
+    "    y = seq[-1] # last\n",
+    "    put = '{0} predicts {1:d}, expecting {2:d}'.format(', '.join(str(val) for val in seq[:-1]), yhat, y)\n",
+    "    print(put)\n",
+    "\n",
+    "    if index>10:\n",
+    "        break\n",
+    "    index+=1\n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 2",
+   "language": "python",
+   "name": "python2"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 2
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython2",
+   "version": "2.7.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

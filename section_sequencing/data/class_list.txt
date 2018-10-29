@@ -1,0 +1,36 @@
+Introduction:Introduction
+Conclusion:Conclusion
+Summary:Conclusion
+Conclusions:Conclusion
+Discussion:Discussion
+Analysis:Results
+Discussion and Future Work:FutureWork
+References:References
+Bibliography:References
+Acknowledgments:Acknowledgments
+Results:Results
+Abstract:Abstract
+Pre_top:Abstract
+Appendix:Appendix
+Related Work:RelatedWork
+Literature Review:RelatedWork
+Experiments:Experiments
+Experimental:Experiments
+Methodology:Approach
+Method:Approach
+Theorem:Theorem
+Proof of Theorem:Theorem
+Evaluation:Evaluation
+Future Work:FutureWork
+Datasets:Datasets
+Contribution:Contribution
+Background:Background
+Implementation:Implementation
+Approach:Approach
+Preliminary:RelatedWork
+Preliminary Work:RelatedWork
+Preliminaries:RelatedWork
+Proof of Lemma:Theorem
+Future Directions:FutureWork
+Proof of the main results:Theorem
+None:None
