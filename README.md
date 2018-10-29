@@ -10,7 +10,7 @@ The system is produced as an output of my thesis.
 **Necessary packages**:
 
 1. Python 2.7 or higher
-2. Tensorflow Latest GPU 
+2. Tensorflow latest GPU 
 3. Keras lastest 
 4. Bokeh python
 5. Skflow 
@@ -21,22 +21,22 @@ The system is produced as an output of my thesis.
 Information: Following are the directories for different modules of the system
 
 
-**Code**: Section classifiers using RNN
+1. **Code**: Section classifiers using RNN
 
 **Location**: section_header_rnn
 
 
-**Code**: Section classifiers using CNN
+2. **Code**: Section classifiers using CNN
 
 **Location**: section_header_cnn
 
 
-**Code**: Semantic section classifiers
+3. **Code**: Semantic section classifiers
 
 **Location**: semantic_section_classifier
 
 
-**Code**: Section sequencing classifers
+4. **Code**: Section sequencing classifers
 
 **Location**: section_sequencing
 
