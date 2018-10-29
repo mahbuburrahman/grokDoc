@@ -23,22 +23,24 @@ Information: Following are the directories for different modules of the system
 
 1. **Code**: Section classifiers using RNN
 
-**Location**: section_header_rnn
+	**Location**: section_header_rnn
 
 
 2. **Code**: Section classifiers using CNN
 
-**Location**: section_header_cnn
+	**Location**: section_header_cnn
 
 
 3. **Code**: Semantic section classifiers
 
-**Location**: semantic_section_classifier
+	**Location**: semantic_section_classifier
 
 
 4. **Code**: Section sequencing classifers
 
-**Location**: section_sequencing
+	**Location**: section_sequencing
+
+
 
 
 
