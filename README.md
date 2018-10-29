@@ -1,22 +1,31 @@
-# grokDoc
-Understanding the Logical and Semantic Structure of Large Documents
+# grokDoc: a system to understand documents
+
+## Understanding the Logical and Semantic Structure of Large Documents
 
 
 
-Code: Section classifiers using RNN
-Location: section_header_rnn
+
+Information: Following are the directories for different modules of the system
 
 
-Code: Section classifiers using CNN
-Location: section_header_cnn
+**Code**: Section classifiers using RNN
+
+**Location**: section_header_rnn
 
 
-Code: Semantic section classifiers
-Location: semantic_section_classifier
+**Code**: Section classifiers using CNN
+
+**Location**: section_header_cnn
 
 
-Code: Section sequencing classifers
-Location: section_sequencing
+**Code**: Semantic section classifiers
+
+**Location**: semantic_section_classifier
+
+
+**Code**: Section sequencing classifers
+
+**Location**: section_sequencing
 
 
 
@@ -28,6 +37,6 @@ Muhammad Mahbubur Rahman and Tim Finin. 2017. Deep Understanding of a Document's
 
 
 For more detailed information: 
-Contact: mrahman1@umbc.edu
+Contact: **mrahman1@umbc.edu**
 
 
